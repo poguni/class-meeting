@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>학급 어린이회</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Square+Round:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<style>
+  :root{
+    --cream:#FFF9EE;
+    --paper:#FFFFFF;
+    --ink:#33324A;
+    --ink-soft:#6B6A85;
+    --yellow:#FFC93C;
+    --yellow-deep:#F5A623;
+    --sky:#49C4EE;
+    --sky-deep:#2AA9D8;
+    --mint:#5FD8A6;
+    --mint-deep:#3CBE8B;
+    --coral:#FF8FA3;
+    --coral-deep:#F16C86;
+    --lavender:#B79CF2;
+    --lavender-deep:#9873E8;
+    --gold:#FFD34D;
+    --silver:#D8DCE6;
+    --shadow: 0 6px 0 rgba(51,50,74,0.08);
+    --radius-lg: 28px;
+    --radius-md: 20px;
+    --radius-sm: 14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 8% 12%, rgba(255,201,60,0.16) 0, transparent 40%),
+      radial-gradient(circle at 92% 85%, rgba(73,196,238,0.16) 0, transparent 42%),
+      var(--cream);
+    color:var(--ink);
+    font-family:'Pretendard', 'Nanum Square Round', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{font-family:'Nanum Square Round', 'Pretendard', sans-serif; font-weight:800;}
+  button{font-family:inherit; cursor:pointer;}
+  input,textarea{font-family:inherit;}
+  ::selection{background:var(--yellow); color:var(--ink);}
+
+  /* ---------- layout shells ---------- */
+  .screen{display:none; min-height:100vh; width:100%;}
+  .screen.active{display:flex;}
+  #app{min-height:100vh;}
+
+  /* ---------- INTRO ---------- */
+  #screen-intro{
+    align-items:center; justify-content:center; flex-direction:column;
+    text-align:center; padding:40px 24px; position:relative; overflow:hidden;
+  }
+  .float-shape{position:absolute; border-radius:50%; opacity:0.5; animation:floaty 7s ease-in-out infinite;}
+  .fs1{width:120px;height:120px; background:var(--yellow); top:8%; left:10%; animation-delay:0s;}
+  .fs2{width:80px;height:80px; background:var(--sky); top:15%; right:12%; animation-delay:1.2s;}
+  .fs3{width:150px;height:150px; background:var(--mint); bottom:10%; left:6%; animation-delay:2s;}
+  .fs4{width:90px;height:90px; background:var(--coral); bottom:14%; right:9%; animation-delay:0.6s;}
+  @keyframes floaty{
+    0%,100%{transform:translateY(0) scale(1);}
+    50%{transform:translateY(-18px) scale(1.05);}
+  }
+  .intro-badge{
+    font-size:22px; background:var(--paper); padding:10px 26px; border-radius:999px;
+    box-shadow:var(--shadow); margin-bottom:22px; color:var(--ink-soft);
+  }
+  .intro-title{
+    font-size:clamp(48px, 8vw, 92px); line-height:1.15; margin:0 0 10px;
+    color:var(--ink);
+  }
+  .intro-title span{color:var(--sky-deep);}
+  .intro-sub{font-size:24px; color:var(--ink-soft); margin:0 0 46px;}
+  .intro-btn-group{display:flex; flex-direction:column; align-items:center; gap:14px; width:320px;}
+  .btn-enter{
+    width:100%; font-size:24px; padding:18px 0; border:none; border-radius:999px;
+    background:var(--yellow); color:var(--ink); box-shadow:0 8px 0 var(--yellow-deep);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .btn-enter:hover{transform:translateY(-3px);}
+  .btn-enter:active{transform:translateY(4px); box-shadow:0 3px 0 var(--yellow-deep);}
+  .btn-new-meeting{
+    width:100%; font-size:24px; padding:18px 0; border:none; border-radius:999px;
+    background:var(--mint); color:#fff; box-shadow:0 8px 0 var(--mint-deep);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .btn-new-meeting:hover{transform:translateY(-2px);}
+  .btn-new-meeting:active{transform:translateY(3px); box-shadow:0 3px 0 var(--mint-deep);}
+  .intro-emoji-row{font-size:38px; margin-top:34px; letter-spacing:14px;}
+
+  /* ---------- SETUP ---------- */
+  #screen-setup{align-items:flex-start; justify-content:center; padding:56px 24px 90px;}
+  .setup-card{
+    width:100%; max-width:920px; background:var(--paper); border-radius:var(--radius-lg);
+    box-shadow:var(--shadow); padding:48px clamp(24px,5vw,64px);
+  }
+  .setup-eyebrow{color:var(--sky-deep); font-size:18px; margin:0 0 6px;}
+  .setup-title{font-size:clamp(32px,4vw,44px); margin:0 0 32px;}
+  .field-label{font-size:20px; color:var(--ink-soft); margin:0 0 10px; display:block;}
+  .field-row{display:flex; gap:16px; margin-bottom:30px; flex-wrap:wrap;}
+  .field-row .field-group{flex:1; min-width:220px;}
+  input[type="text"]{
+    width:100%; font-size:24px; padding:16px 20px; border-radius:var(--radius-sm);
+    border:3px solid #EFE9DA; background:#FFFDF8; color:var(--ink); outline:none;
+    transition:border-color .15s ease;
+  }
+  input[type="text"]:focus{border-color:var(--sky);}
+  .step-block{margin-top:8px; margin-bottom:36px;}
+  .chip-wrap{display:flex; flex-wrap:wrap; gap:12px; margin-top:14px;}
+  .chip{
+    display:flex; align-items:center; gap:8px; font-size:19px; padding:12px 20px;
+    border-radius:999px; border:3px solid #EFE9DA; background:#FFFDF8; color:var(--ink-soft);
+    transition:all .15s ease; user-select:none;
+  }
+  .chip .chip-num{
+    font-size:13px; width:20px; height:20px; border-radius:50%; background:#EFE9DA;
+    color:var(--ink-soft); display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .chip.active{
+    background:var(--mint); border-color:var(--mint-deep); color:#fff; box-shadow:0 4px 0 var(--mint-deep);
+  }
+  .chip.active .chip-num{background:rgba(255,255,255,0.35); color:#fff;}
+  .chip:hover{transform:translateY(-2px);}
+  .setup-footer{display:flex; align-items:center; justify-content:space-between; margin-top:44px; flex-wrap:wrap; gap:16px;}
+  .selected-count{font-size:18px; color:var(--ink-soft);}
+  .selected-count b{color:var(--sky-deep);}
+  .btn-primary{
+    font-size:24px; padding:18px 46px; border:none; border-radius:999px;
+    background:var(--sky); color:#fff; box-shadow:0 6px 0 var(--sky-deep);
+    transition:transform .12s ease, box-shadow .12s ease, opacity .15s ease;
+  }
+  .btn-primary:disabled{opacity:0.4; cursor:not-allowed;}
+  .btn-primary:not(:disabled):hover{transform:translateY(-2px);}
+  .btn-primary:not(:disabled):active{transform:translateY(3px); box-shadow:0 3px 0 var(--sky-deep);}
+
+  /* ---------- MEETING ---------- */
+  #screen-meeting{width:100%;}
+  .meeting-shell{display:flex; width:100%; min-height:100vh;}
+
+  .sidebar{
+    width:320px; flex-shrink:0; background:var(--paper); box-shadow:2px 0 0 rgba(51,50,74,0.05);
+    display:flex; flex-direction:column; transition:width .22s ease; overflow:hidden;
+  }
+  .sidebar.collapsed{width:96px;}
+  .sidebar-head{
+    padding:22px 22px 14px; display:flex; align-items:center; justify-content:space-between;
+    gap:10px;
+  }
+  .sidebar-head .sh-title{font-size:20px; color:var(--ink-soft); white-space:nowrap;}
+  .sidebar.collapsed .sh-title{display:none;}
+  .btn-toggle{
+    width:44px; height:44px; border-radius:50%; border:none; background:#F3EFE3;
+    font-size:20px; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    transition:background .15s ease;
+  }
+  .btn-toggle:hover{background:#E9E2CF;}
+  .journey{flex:1; overflow-y:auto; padding:10px 0 24px;}
+  .journey-item{
+    display:flex; align-items:center; gap:14px; padding:12px 22px; cursor:pointer; position:relative;
+  }
+  .journey-item::before{
+    content:''; position:absolute; left:44px; top:-2px; width:2px; height:14px; background:#E6E0D0;
+  }
+  .journey-item:first-child::before{display:none;}
+  .stone{
+    width:44px; height:44px; border-radius:50%; background:#F3EFE3; color:var(--ink-soft);
+    display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;
+    border:3px solid transparent; transition:all .15s ease;
+  }
+  .journey-item.done .stone{background:var(--mint); color:#fff;}
+  .journey-item.current .stone{
+    background:var(--yellow); color:var(--ink); border-color:var(--yellow-deep);
+    transform:scale(1.12); box-shadow:0 3px 0 var(--yellow-deep);
+  }
+  .journey-label{font-size:17px; color:var(--ink-soft); line-height:1.3;}
+  .journey-item.current .journey-label{color:var(--ink); font-weight:bold;}
+  .journey-item.done .journey-label{color:var(--ink-soft);}
+  .sidebar.collapsed .journey-label{display:none;}
+  .sidebar.collapsed .journey-item{justify-content:center; padding:12px 0;}
+  .sidebar.collapsed .journey-item::before{left:50%;}
+  .sidebar-foot{padding:16px 22px 24px; display:flex; flex-direction:column; gap:10px;}
+  .btn-save{
+    width:100%; font-size:17px; padding:14px; border-radius:var(--radius-sm); border:none;
+    background:#EDFBF3; color:var(--mint-deep); font-weight:bold;
+  }
+  .btn-setup{
+    width:100%; font-size:17px; padding:14px; border-radius:var(--radius-sm); border:none;
+    background:#EAF8FF; color:var(--sky-deep); font-weight:bold;
+  }
+  .btn-home{
+    width:100%; font-size:17px; padding:14px; border-radius:var(--radius-sm); border:none;
+    background:#FDF1F1; color:var(--coral-deep); font-weight:bold;
+  }
+  .sidebar.collapsed .btn-save{font-size:20px; padding:14px 0;}
+  .sidebar.collapsed .btn-save span.txt{display:none;}
+  .sidebar.collapsed .btn-setup{font-size:20px; padding:14px 0;}
+  .sidebar.collapsed .btn-setup span.txt{display:none;}
+  .sidebar.collapsed .btn-home{font-size:20px; padding:14px 0;}
+  .sidebar.collapsed .btn-home span.txt{display:none;}
+
+  .main{flex:1; display:flex; flex-direction:column; min-width:0;}
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between; padding:22px 40px;
+    background:var(--paper); box-shadow:0 2px 0 rgba(51,50,74,0.05); flex-wrap:wrap; gap:12px;
+  }
+  .topbar-info{display:flex; align-items:center; gap:18px; flex-wrap:wrap;}
+  .topbar-class{
+    font-size:22px; background:var(--sky); color:#fff; padding:8px 20px; border-radius:999px;
+    font-family:'Nanum Square Round',sans-serif; font-weight:800;
+  }
+  .topbar-topic{font-size:22px; color:var(--ink-soft);}
+  .topbar-topic b{color:var(--ink);}
+  .progress-pill{font-size:16px; color:var(--ink-soft); background:#F3EFE3; padding:8px 16px; border-radius:999px;}
+
+  .stage{flex:1; padding:40px clamp(20px,5vw,60px) 20px; overflow-y:auto;}
+  .step-card{
+    max-width:1000px; margin:0 auto; background:var(--paper); border-radius:var(--radius-lg);
+    box-shadow:var(--shadow); padding:clamp(28px,4vw,56px); min-height:60vh;
+    display:flex; flex-direction:column;
+  }
+  .step-eyebrow{display:flex; align-items:center; gap:14px; margin-bottom:6px;}
+  .step-emoji{font-size:44px;}
+  .step-num{font-size:17px; color:var(--ink-soft);}
+  .step-title{font-size:clamp(34px,4.5vw,50px); margin:6px 0 30px;}
+
+  /* ceremonial */
+  .ceremonial{
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; gap:26px;
+  }
+  .ceremonial .big-emoji{font-size:clamp(90px,14vw,150px); animation:bounce 2.4s ease-in-out infinite;}
+  @keyframes bounce{0%,100%{transform:translateY(0);} 50%{transform:translateY(-16px);}}
+  .ceremonial .cere-text{font-size:clamp(24px,3vw,32px); color:var(--ink-soft); max-width:640px;}
+
+  /* shared video text styles */
+  .yt-cere-text{
+    font-size:clamp(22px,2.8vw,30px); color:var(--ink-soft); text-align:center; margin:0;
+  }
+  .yt-source{
+    font-size:14px; color:var(--ink-soft); text-align:center; margin:0;
+  }
+
+  /* free text */
+  .free-wrap{flex:1; display:flex; flex-direction:column;}
+  .free-hint{font-size:19px; color:var(--ink-soft); margin-bottom:16px;}
+  textarea.free-area{
+    flex:1; min-height:340px; width:100%; font-size:24px; line-height:1.6; padding:26px;
+    border-radius:var(--radius-md); border:3px solid #EFE9DA; background:#FFFDF8; color:var(--ink);
+    resize:vertical; outline:none;
+  }
+  textarea.free-area:focus{border-color:var(--sky);}
+
+  /* opinion list */
+  .opinion-toolbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:12px;}
+  .opinion-hint{font-size:19px; color:var(--ink-soft);}
+  .btn-toggle-result{
+    font-size:17px; padding:12px 22px; border-radius:999px; border:none;
+    background:var(--lavender); color:#fff; box-shadow:0 4px 0 var(--lavender-deep);
+  }
+  .opinion-rows{display:flex; flex-direction:column; gap:14px;}
+  .opinion-row{
+    display:flex; gap:12px; align-items:center; background:#FFFDF8; border:3px solid #EFE9DA;
+    border-radius:var(--radius-sm); padding:12px 16px; flex-wrap:wrap;
+  }
+  .opinion-row .row-num{
+    width:34px; height:34px; border-radius:50%; background:#F3EFE3; color:var(--ink-soft);
+    display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;
+  }
+  .opinion-row input[type="text"].name-in{width:150px; font-size:19px; padding:12px 14px; flex-shrink:0;}
+  .opinion-row input[type="text"].opinion-in{flex:1; min-width:180px; font-size:19px; padding:12px 14px;}
+  .opinion-row input[type="number"].vote-in{
+    width:90px; font-size:19px; padding:12px 10px; text-align:center; border-radius:var(--radius-sm);
+    border:3px solid #EFE9DA; background:#fff; outline:none;
+  }
+  .opinion-row input[type="number"].vote-in:focus{border-color:var(--coral);}
+  .vote-label{font-size:15px; color:var(--ink-soft); flex-shrink:0;}
+  .btn-remove-row{
+    width:34px; height:34px; border-radius:50%; border:none; background:#FDF1F1; color:var(--coral-deep);
+    font-size:18px; flex-shrink:0;
+  }
+  .btn-add-row{
+    margin-top:16px; align-self:flex-start; font-size:18px; padding:14px 26px; border-radius:999px;
+    border:3px dashed #D8CFAF; background:transparent; color:var(--ink-soft);
+  }
+  .btn-add-row:hover{background:#FBF6E9;}
+
+  /* vote results */
+  .result-cards{display:flex; flex-direction:column; gap:16px;}
+  .result-card{
+    display:flex; align-items:center; gap:24px;
+    border-radius:var(--radius-md); padding:28px 36px;
+  }
+  .result-card--1{
+    background:linear-gradient(135deg,#FFFAE8,#FFF0BC);
+    border:3px solid var(--yellow-deep);
+    box-shadow:0 5px 0 rgba(245,166,35,0.25);
+  }
+  .result-card--2{
+    background:linear-gradient(135deg,#F4F6FA,#E8EBF4);
+    border:3px solid #B8BFCE;
+    box-shadow:0 5px 0 rgba(150,160,180,0.2);
+  }
+  .result-card__rank{
+    font-family:'Nanum Square Round',sans-serif; font-weight:800;
+    font-size:clamp(28px,3vw,38px); color:var(--ink-soft);
+    min-width:70px; flex-shrink:0; text-align:center;
+  }
+  .result-card--1 .result-card__rank{color:var(--yellow-deep);}
+  .result-card--2 .result-card__rank{color:#8890A4;}
+  .result-card__name{
+    font-family:'Nanum Square Round',sans-serif; font-weight:800;
+    font-size:clamp(26px,3vw,36px); color:var(--ink);
+    min-width:120px; flex-shrink:0;
+  }
+  .result-card__text{
+    flex:1; font-size:clamp(22px,2.5vw,30px); color:var(--ink); line-height:1.4;
+  }
+  .result-card__votes{
+    font-size:clamp(20px,2.2vw,26px); color:var(--ink-soft);
+    flex-shrink:0; text-align:right; min-width:60px;
+  }
+  .empty-note{font-size:19px; color:var(--ink-soft); text-align:center; padding:40px 0;}
+
+  /* footer nav */
+  .step-nav{
+    display:flex; justify-content:space-between; align-items:center; padding:18px clamp(20px,5vw,60px) 30px;
+    max-width:1000px; margin:0 auto; width:100%;
+  }
+  .nav-btn{
+    font-size:20px; padding:16px 34px; border-radius:999px; border:none; display:flex; align-items:center; gap:8px;
+  }
+  .nav-prev{background:#F3EFE3; color:var(--ink-soft); box-shadow:0 5px 0 #E1D9C2;}
+  .nav-next{background:var(--coral); color:#fff; box-shadow:0 5px 0 var(--coral-deep);}
+  .nav-btn:disabled{opacity:0.35; cursor:not-allowed;}
+  .nav-btn:not(:disabled):active{transform:translateY(3px); box-shadow:none;}
+
+  /* anthem local video */
+  .anthem-wrap{
+    flex:1; display:flex; flex-direction:column; width:100%; gap:18px;
+  }
+  .anthem-player-box{
+    position:relative; width:100%; padding-bottom:56.25%;
+    border-radius:var(--radius-md); overflow:hidden; background:#111;
+    box-shadow:var(--shadow);
+  }
+  .anthem-player-box video{
+    position:absolute; top:0; left:0; width:100%; height:100%;
+    object-fit:contain;
+  }
+  .anthem-overlay{
+    position:absolute; top:0; left:0; width:100%; height:100%;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(0,0,0,0.0); transition:opacity .2s, background .2s;
+    cursor:pointer;
+    opacity:0;
+  }
+  .anthem-player-box:hover .anthem-overlay{
+    opacity:1;
+    background:rgba(0,0,0,0.28);
+  }
+  .anthem-play-btn{
+    width:100px; height:100px; border-radius:50%; border:none;
+    background:rgba(255,255,255,0.92); color:var(--ink);
+    font-size:38px; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 6px 24px rgba(0,0,0,0.35); transition:transform .15s ease;
+    padding-left:8px; /* optical center for ▶ */
+  }
+  .anthem-play-btn:hover{transform:scale(1.1);}
+
+  /* topic banner */
+  .topic-banner{
+    font-family:'Nanum Square Round','Pretendard',sans-serif; font-weight:800;
+    font-size:clamp(26px,3.5vw,40px); color:var(--sky-deep);
+    background:linear-gradient(135deg,#EAF8FF,#D0F0FF);
+    border:3px solid var(--sky); border-radius:var(--radius-md);
+    padding:22px 30px; margin-bottom:22px; text-align:center;
+    box-shadow:0 4px 0 rgba(42,169,216,0.2);
+  }
+
+  /* multi textarea stack */
+  .multi-wrap{display:flex; flex-direction:column; gap:18px;}
+  .multi-area{
+    width:100%; font-size:22px; line-height:1.6; padding:22px 24px; min-height:110px;
+    border-radius:var(--radius-md); border:3px solid #EFE9DA; background:#FFFDF8;
+    color:var(--ink); resize:vertical; outline:none;
+  }
+  .multi-area:focus{border-color:var(--mint);}
+
+  /* dept rows */
+  .dept-wrap{display:flex; flex-direction:column;}
+  .dept-rows{display:flex; flex-direction:column; gap:14px; margin-bottom:6px;}
+  .dept-row{
+    display:flex; gap:12px; align-items:center; background:#FFFDF8; border:3px solid #EFE9DA;
+    border-radius:var(--radius-sm); padding:12px 16px;
+  }
+  .dept-row .row-num{
+    width:34px; height:34px; border-radius:50%; background:#F3EFE3; color:var(--ink-soft);
+    display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;
+  }
+  input[type="text"].dept-name-in{width:160px; font-size:19px; padding:12px 14px; flex-shrink:0;}
+  input[type="text"].dept-content-in{flex:1; min-width:180px; font-size:19px; padding:12px 14px;}
+
+  @media (max-width:820px){
+    .sidebar{position:fixed; z-index:20; height:100vh;}
+    .sidebar.collapsed{width:0;}
+    .meeting-shell{position:relative;}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ===== INTRO ===== -->
+  <section id="screen-intro" class="screen active">
+    <div class="float-shape fs1"></div>
+    <div class="float-shape fs2"></div>
+    <div class="float-shape fs3"></div>
+    <div class="float-shape fs4"></div>
+    <div class="intro-badge">우리 반이 함께 만드는 시간</div>
+    <h1 class="intro-title">학급 <span>어린이회</span></h1>
+    <p class="intro-sub">오늘의 회의를 다함께 시작해 봅시다.</p>
+    <div class="intro-btn-group">
+      <button class="btn-enter" id="btn-go-setup">🚪 들어가기</button>
+      <button class="btn-new-meeting" id="btn-new-meeting">✨ 새 회의 시작</button>
+    </div>
+    <div class="intro-emoji-row">🏫 📣 🗳️ 👏</div>
+  </section>
+
+  <!-- ===== SETUP ===== -->
+  <section id="screen-setup" class="screen">
+    <div class="setup-card">
+      <p class="setup-eyebrow">회의 준비하기</p>
+      <h2 class="setup-title">오늘 회의 정보를 알려주세요 ✏️</h2>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">학년 · 반</label>
+          <input type="text" id="input-class" placeholder="예) 5학년 3반">
+        </div>
+        <div class="field-group">
+          <label class="field-label">오늘 회의 주제</label>
+          <input type="text" id="input-topic" placeholder="예) 즐거운 학교생활 만들기">
+        </div>
+      </div>
+
+      <div class="step-block">
+        <label class="field-label">회의 절차를 선택하세요 (원하는 순서대로 켜고 끌 수 있어요)</label>
+        <div class="chip-wrap" id="chip-wrap"></div>
+      </div>
+
+      <div class="setup-footer">
+        <div class="selected-count">선택된 절차 <b id="selected-count-num">13</b>개</div>
+        <button class="btn-primary" id="btn-start-meeting" disabled>🎉 회의 시작하기</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== MEETING ===== -->
+  <section id="screen-meeting" class="screen">
+    <div class="meeting-shell">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-head">
+          <span class="sh-title">회의 순서</span>
+          <button class="btn-toggle" id="btn-toggle-sidebar">◀</button>
+        </div>
+        <div class="journey" id="journey"></div>
+        <div class="sidebar-foot">
+          <button class="btn-save" id="btn-save">💾 <span class="txt">저장하기</span></button>
+          <button class="btn-setup" id="btn-go-meeting-setup">⚙️ <span class="txt">회의 설정</span></button>
+          <button class="btn-home" id="btn-home">🏠 <span class="txt">처음으로</span></button>
+        </div>
+      </aside>
+
+      <div class="main">
+        <div class="topbar">
+          <div class="topbar-info">
+            <span class="topbar-class" id="topbar-class"></span>
+            <span class="topbar-topic">오늘의 주제 · <b id="topbar-topic"></b></span>
+          </div>
+          <div class="progress-pill" id="progress-pill"></div>
+        </div>
+
+        <div class="stage">
+          <div class="step-card" id="step-card"></div>
+        </div>
+
+        <div class="step-nav">
+          <button class="nav-btn nav-prev" id="btn-prev">◀ 이전 순서</button>
+          <button class="nav-btn nav-next" id="btn-next">다음 순서 ▶</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------- Step definitions ---------------- */
+  var STEP_DEFS = [
+    {id:1,  label:"개회 선언",         emoji:"📢", type:"ceremonial", hint:"지금부터 학급 어린이회의를 시작하겠습니다."},
+    {id:2,  label:"국기에 대한 경례",   emoji:"🇰🇷", type:"flag",      hint:"모두 자리에서 일어나 정면에 있는 국기를 향해 주시기 바랍니다."},
+    {id:3,  label:"애국가 부르기",      emoji:"🎵", type:"anthem",     hint:"모두 자리에서 일어나 애국가를 함께 불러봅시다."},
+    {id:4,  label:"이번 주 생활 반성",  emoji:"🪞", type:"opinion",   hint:"이번 주 우리 반 생활을 되돌아보며 잘한 점과 고쳐야 할 점을 발표해 봅시다."},
+    {id:5,  label:"다음 주 생활 계획",  emoji:"🗳️", type:"vote",      hint:"다음 주 실천 사항을 발표하고, 투표로 결정해 봅시다."},
+    {id:6,  label:"각 부서 발표",       emoji:"📊", type:"dept",      hint:"각 부서에서 이번 주 활동을 발표해주세요."},
+    {id:7,  label:"활동 보고",          emoji:"📋", type:"multi",     hint:"학급 활동에 대해 보고할 내용을 적어주세요.", slots:3},
+    {id:8,  label:"건의 사항",          emoji:"💡", type:"opinion",   hint:"우리 반과 학교를 위한 좋은 의견을 자유롭게 나눠주세요."},
+    {id:9,  label:"자유 발언 시간",     emoji:"🎤", type:"multi",     hint:"하고 싶은 이야기를 자유롭게 이야기해 봅시다.", slots:3},
+    {id:10, label:"선생님 말씀",        emoji:"🍎", type:"multi",     hint:"선생님이 들려주시는 말씀을 적어 봅시다.", slots:3},
+    {id:11, label:"칭찬합니다!",        emoji:"👏", type:"opinion",   hint:"친구에게 고마웠던 일, 칭찬하고 싶은 점을 나누어 봅시다."},
+    {id:12, label:"교가 부르기",        emoji:"🎶", type:"alma",      hint:"모두 자리에서 일어나 교가를 불러 주시기 바랍니다."},
+    {id:13, label:"폐회 선언",          emoji:"🔔", type:"ceremonial", hint:"이상으로 오늘의 학급 어린이회의를 마치겠습니다. 모두 수고하셨습니다!"}
+  ];
+
+  var STORAGE_KEY = "classMeetingState_v1";
+  var DEFAULT_ROWS = 5;
+
+  /* ---------------- State ---------------- */
+  var state = {
+    className: "",
+    topic: "",
+    selectedIds: STEP_DEFS.map(function(s){return s.id;}),
+    currentIndex: 0,
+    sidebarCollapsed: false,
+    stepData: {},      // id -> {text} for free, [] for opinion/vote
+    resultMode: {}      // id -> bool (vote step showing results)
+  };
+
+  function emptyRow(hasVote){
+    return hasVote ? {name:"", text:"", votes:0} : {name:"", text:""};
+  }
+
+  function ensureStepData(id, type, slots){
+    if(type === "opinion" || type === "vote"){
+      if(!state.stepData[id]){
+        state.stepData[id] = [];
+        for(var i=0;i<DEFAULT_ROWS;i++) state.stepData[id].push(emptyRow(type==="vote"));
+      }
+    } else if(type === "free"){
+      if(state.stepData[id] === undefined) state.stepData[id] = "";
+    } else if(type === "dept"){
+      if(!state.stepData[id]){
+        state.stepData[id] = [];
+        for(var i=0;i<DEFAULT_ROWS;i++) state.stepData[id].push({dept:"", content:""});
+      }
+    } else if(type === "multi"){
+      if(!state.stepData[id]){
+        var n = slots || 3;
+        state.stepData[id] = [];
+        for(var i=0;i<n;i++) state.stepData[id].push("");
+      }
+    }
+  }
+
+  function save(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+  }
+  function load(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        var parsed = JSON.parse(raw);
+        if(parsed && parsed.className !== undefined){
+          state = Object.assign(state, parsed);
+        }
+      }
+    }catch(e){}
+  }
+
+  function stepDef(id){
+    for(var i=0;i<STEP_DEFS.length;i++) if(STEP_DEFS[i].id===id) return STEP_DEFS[i];
+    return null;
+  }
+
+  function selectedSteps(){
+    return state.selectedIds
+      .map(stepDef)
+      .filter(Boolean);
+  }
+
+  /* ---------------- Screen switching ---------------- */
+  function showScreen(name){
+    document.querySelectorAll(".screen").forEach(function(el){ el.classList.remove("active"); });
+    document.getElementById("screen-"+name).classList.add("active");
+  }
+
+  /* ---------------- INTRO ---------------- */
+  document.getElementById("btn-go-setup").addEventListener("click", function(){
+    if(state.className && Object.keys(state.stepData).length > 0){
+      showScreen("meeting");
+      renderMeeting();
+    } else {
+      showScreen("setup");
+      renderChips();
+      syncSetupFields();
+    }
+  });
+
+  document.getElementById("btn-new-meeting").addEventListener("click", function(){
+    state = {
+      className:"", topic:"", selectedIds: STEP_DEFS.map(function(s){return s.id;}),
+      currentIndex:0, sidebarCollapsed:false, stepData:{}, resultMode:{}
+    };
+    save();
+    showScreen("setup");
+    renderChips();
+    syncSetupFields();
+  });
+
+  /* ---------------- SETUP ---------------- */
+  var chipWrap = document.getElementById("chip-wrap");
+  var inputClass = document.getElementById("input-class");
+  var inputTopic = document.getElementById("input-topic");
+  var btnStart = document.getElementById("btn-start-meeting");
+  var selectedCountNum = document.getElementById("selected-count-num");
+
+  function syncSetupFields(){
+    inputClass.value = state.className;
+    inputTopic.value = state.topic;
+    validateSetup();
+  }
+
+  function renderChips(){
+    chipWrap.innerHTML = "";
+    STEP_DEFS.forEach(function(def){
+      var chip = document.createElement("div");
+      var active = state.selectedIds.indexOf(def.id) !== -1;
+      chip.className = "chip" + (active ? " active" : "");
+      chip.setAttribute("data-id", def.id);
+      chip.innerHTML =
+        '<span class="chip-num">' + def.id + '</span>' +
+        '<span>' + def.emoji + ' ' + def.label + '</span>';
+      chip.addEventListener("click", function(){
+        toggleStep(def.id);
+      });
+      chipWrap.appendChild(chip);
+    });
+    updateSelectedCount();
+  }
+
+  function toggleStep(id){
+    var idx = state.selectedIds.indexOf(id);
+    if(idx === -1){
+      state.selectedIds.push(id);
+      state.selectedIds.sort(function(a,b){return a-b;});
+    } else {
+      state.selectedIds.splice(idx,1);
+    }
+    renderChips();
+    validateSetup();
+  }
+
+  function updateSelectedCount(){
+    selectedCountNum.textContent = state.selectedIds.length;
+  }
+
+  function validateSetup(){
+    updateSelectedCount();
+    var ok = inputClass.value.trim().length > 0 &&
+             inputTopic.value.trim().length > 0 &&
+             state.selectedIds.length > 0;
+    btnStart.disabled = !ok;
+  }
+
+  inputClass.addEventListener("input", function(){ state.className = inputClass.value; validateSetup(); });
+  inputTopic.addEventListener("input", function(){ state.topic = inputTopic.value; validateSetup(); });
+
+  btnStart.addEventListener("click", function(){
+    state.className = inputClass.value.trim();
+    state.topic = inputTopic.value.trim();
+    state.currentIndex = 0;
+    selectedSteps().forEach(function(def){ ensureStepData(def.id, def.type, def.slots); });
+    save();
+    showScreen("meeting");
+    renderMeeting();
+  });
+
+  /* ---------------- MEETING ---------------- */
+  var sidebarEl = document.getElementById("sidebar");
+  var journeyEl = document.getElementById("journey");
+  var stepCardEl = document.getElementById("step-card");
+  var topbarClassEl = document.getElementById("topbar-class");
+  var topbarTopicEl = document.getElementById("topbar-topic");
+  var progressPillEl = document.getElementById("progress-pill");
+  var btnPrev = document.getElementById("btn-prev");
+  var btnNext = document.getElementById("btn-next");
+
+  document.getElementById("btn-toggle-sidebar").addEventListener("click", function(){
+    state.sidebarCollapsed = !state.sidebarCollapsed;
+    applySidebarState();
+    save();
+  });
+
+  function applySidebarState(){
+    sidebarEl.classList.toggle("collapsed", state.sidebarCollapsed);
+    document.getElementById("btn-toggle-sidebar").textContent = state.sidebarCollapsed ? "▶" : "◀";
+  }
+
+  document.getElementById("btn-home").addEventListener("click", function(){
+    save();
+    showScreen("intro");
+  });
+
+  document.getElementById("btn-go-meeting-setup").addEventListener("click", function(){
+    save();
+    showScreen("setup");
+    renderChips();
+    syncSetupFields();
+  });
+
+  document.getElementById("btn-save").addEventListener("click", function(){
+    saveReport();
+  });
+
+  /* ---------------- Save Report ---------------- */
+  function saveReport(){
+    var today = new Date();
+    var dateStr = today.getFullYear() + "년 " +
+      (today.getMonth()+1) + "월 " +
+      today.getDate() + "일";
+    var fileDateStr = today.getFullYear() +
+      String(today.getMonth()+1).padStart(2,"0") +
+      String(today.getDate()).padStart(2,"0");
+
+    var steps = selectedSteps();
+    var sections = "";
+
+    steps.forEach(function(def){
+      var data = state.stepData[def.id];
+      sections += buildSection(def, data);
+    });
+
+    var html = "<!DOCTYPE html>\n<html lang='ko'>\n<head>\n" +
+      "<meta charset='UTF-8'>\n" +
+      "<meta name='viewport' content='width=device-width,initial-scale=1'>\n" +
+      "<title>학급 어린이회의록 - " + escapeHtml(state.className) + " " + dateStr + "</title>\n" +
+      "<link href='https://fonts.googleapis.com/css2?family=Nanum+Square+Round:wght@400;700;800&display=swap' rel='stylesheet'>\n" +
+      "<style>\n" +
+      "  *{box-sizing:border-box; margin:0; padding:0;}\n" +
+      "  body{font-family:'Nanum Square Round',sans-serif; background:#FFF9EE; color:#33324A; padding:40px 24px;}\n" +
+      "  .report{max-width:860px; margin:0 auto;}\n" +
+      "  .report-header{background:linear-gradient(135deg,#49C4EE,#2AA9D8); color:#fff; border-radius:20px; padding:36px 40px; margin-bottom:32px;}\n" +
+      "  .report-header h1{font-size:32px; margin-bottom:16px;}\n" +
+      "  .report-meta{display:flex; gap:24px; flex-wrap:wrap; font-size:17px; opacity:.92;}\n" +
+      "  .report-meta span{background:rgba(255,255,255,.2); padding:6px 16px; border-radius:999px;}\n" +
+      "  .section{background:#fff; border-radius:16px; padding:28px 32px; margin-bottom:20px; box-shadow:0 4px 0 rgba(51,50,74,.06);}\n" +
+      "  .section-title{display:flex; align-items:center; gap:10px; font-size:22px; font-weight:800; margin-bottom:18px; color:#33324A;}\n" +
+      "  .section-title .emoji{font-size:26px;}\n" +
+      "  .ceremonial-note{font-size:17px; color:#6B6A85; padding:14px 0;}\n" +
+      "  .opinion-table{width:100%; border-collapse:collapse;}\n" +
+      "  .opinion-table th{background:#F3EFE3; padding:10px 14px; text-align:left; font-size:15px; color:#6B6A85;}\n" +
+      "  .opinion-table td{padding:12px 14px; font-size:17px; border-bottom:1px solid #F0EBE0; vertical-align:top;}\n" +
+      "  .opinion-table tr:last-child td{border-bottom:none;}\n" +
+      "  .dept-table{width:100%; border-collapse:collapse;}\n" +
+      "  .dept-table th{background:#F3EFE3; padding:10px 14px; text-align:left; font-size:15px; color:#6B6A85; width:200px;}\n" +
+      "  .dept-table td{padding:12px 14px; font-size:17px; border-bottom:1px solid #F0EBE0; vertical-align:top;}\n" +
+      "  .dept-table tr:last-child td{border-bottom:none;}\n" +
+      "  .multi-block{display:flex; flex-direction:column; gap:10px;}\n" +
+      "  .multi-item{background:#FFFDF8; border:2px solid #EFE9DA; border-radius:10px; padding:14px 18px; font-size:17px; line-height:1.6; white-space:pre-wrap;}\n" +
+      "  .multi-item.empty{color:#B0A890; font-style:italic;}\n" +
+      "  .vote-result{display:flex; flex-direction:column; gap:12px; margin-top:6px;}\n" +
+      "  .vote-card{display:flex; align-items:center; gap:16px; border-radius:12px; padding:18px 24px;}\n" +
+      "  .vote-card.rank1{background:linear-gradient(135deg,#FFFAE8,#FFF0BC); border:2px solid #F5A623;}\n" +
+      "  .vote-card.rank2{background:linear-gradient(135deg,#F4F6FA,#E8EBF4); border:2px solid #B8BFCE;}\n" +
+      "  .vote-rank{font-size:20px; font-weight:800; min-width:50px; color:#888;}\n" +
+      "  .vote-card.rank1 .vote-rank{color:#F5A623;}\n" +
+      "  .vote-name{font-size:18px; font-weight:800; min-width:100px;}\n" +
+      "  .vote-text{flex:1; font-size:17px;}\n" +
+      "  .vote-count{font-size:16px; color:#6B6A85;}\n" +
+      "  .vote-all-title{font-size:15px; color:#6B6A85; margin-top:16px; margin-bottom:8px; font-weight:700;}\n" +
+      "  .footer{text-align:center; font-size:14px; color:#B0A890; margin-top:36px; padding-top:20px; border-top:2px dashed #EFE9DA;}\n" +
+      "</style>\n</head>\n<body>\n" +
+      "<div class='report'>\n" +
+      "  <div class='report-header'>\n" +
+      "    <h1>📋 학급 어린이회의록</h1>\n" +
+      "    <div class='report-meta'>\n" +
+      "      <span>🏫 " + escapeHtml(state.className) + "</span>\n" +
+      "      <span>📅 " + dateStr + "</span>\n" +
+      "      <span>💬 " + escapeHtml(state.topic || "주제 없음") + "</span>\n" +
+      "    </div>\n" +
+      "  </div>\n" +
+      sections +
+      "  <div class='footer'>학급 어린이회 프로그램으로 작성된 회의록입니다.</div>\n" +
+      "</div>\n</body>\n</html>";
+
+    var fileName = (state.className || "학급").replace(/\s/g,"") + "_" + fileDateStr + "_회의록.html";
+    var blob = new Blob([html], {type:"text/html;charset=utf-8"});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
+  }
+
+  function buildSection(def, data){
+    var title = "<div class='section-title'><span class='emoji'>" + def.emoji + "</span>" + escapeHtml(def.label) + "</div>\n";
+    var body = "";
+
+    if(def.type === "ceremonial" || def.type === "flag" || def.type === "anthem" || def.type === "alma"){
+      body = "<p class='ceremonial-note'>" + escapeHtml(def.hint) + "</p>\n";
+
+    } else if(def.type === "opinion"){
+      var rows = (data||[]).filter(function(r){ return (r.name||"").trim() || (r.text||"").trim(); });
+      if(rows.length === 0){
+        body = "<p class='ceremonial-note'>입력된 내용이 없습니다.</p>\n";
+      } else {
+        body = "<table class='opinion-table'><thead><tr><th>이름</th><th>발표 내용</th></tr></thead><tbody>\n";
+        rows.forEach(function(r){
+          body += "<tr><td>" + escapeHtml(r.name||"") + "</td><td>" + escapeHtml(r.text||"") + "</td></tr>\n";
+        });
+        body += "</tbody></table>\n";
+      }
+
+    } else if(def.type === "vote"){
+      // 전체 발표 목록
+      var vrows = (data||[]).filter(function(r){ return (r.name||"").trim() || (r.text||"").trim() || parseInt(r.votes,10)>0; });
+      if(vrows.length === 0){
+        body = "<p class='ceremonial-note'>입력된 내용이 없습니다.</p>\n";
+      } else {
+        // 투표 결과
+        var sorted = vrows.slice().map(function(r){
+          return {name:r.name||"", text:r.text||"", votes:parseInt(r.votes,10)||0};
+        }).sort(function(a,b){ return b.votes - a.votes; });
+        var uv = [];
+        sorted.forEach(function(r){ if(uv.indexOf(r.votes)===-1) uv.push(r.votes); });
+        uv.sort(function(a,b){ return b-a; });
+        var rank1 = sorted.filter(function(r){ return r.votes===uv[0]; });
+        var rank2 = uv.length>1 ? sorted.filter(function(r){ return r.votes===uv[1]; }) : [];
+
+        body = "<div class='vote-result'>\n";
+        rank1.forEach(function(r){
+          body += "<div class='vote-card rank1'><div class='vote-rank'>1위</div><div class='vote-name'>" + escapeHtml(r.name) + "</div><div class='vote-text'>" + escapeHtml(r.text) + "</div><div class='vote-count'>" + r.votes + "표</div></div>\n";
+        });
+        rank2.forEach(function(r){
+          body += "<div class='vote-card rank2'><div class='vote-rank'>2위</div><div class='vote-name'>" + escapeHtml(r.name) + "</div><div class='vote-text'>" + escapeHtml(r.text) + "</div><div class='vote-count'>" + r.votes + "표</div></div>\n";
+        });
+        body += "</div>\n";
+        // 전체 발표 목록
+        body += "<p class='vote-all-title'>전체 발표 내용</p>\n";
+        body += "<table class='opinion-table'><thead><tr><th>이름</th><th>제안 내용</th><th>득표 수</th></tr></thead><tbody>\n";
+        sorted.forEach(function(r){
+          body += "<tr><td>" + escapeHtml(r.name) + "</td><td>" + escapeHtml(r.text) + "</td><td>" + r.votes + "표</td></tr>\n";
+        });
+        body += "</tbody></table>\n";
+      }
+
+    } else if(def.type === "dept"){
+      var drows = (data||[]).filter(function(r){ return (r.dept||"").trim() || (r.content||"").trim(); });
+      if(drows.length === 0){
+        body = "<p class='ceremonial-note'>입력된 내용이 없습니다.</p>\n";
+      } else {
+        body = "<table class='dept-table'><thead><tr><th>부서 이름</th><th>활동 내용</th></tr></thead><tbody>\n";
+        drows.forEach(function(r){
+          body += "<tr><td>" + escapeHtml(r.dept||"") + "</td><td>" + escapeHtml(r.content||"") + "</td></tr>\n";
+        });
+        body += "</tbody></table>\n";
+      }
+
+    } else if(def.type === "multi"){
+      var items = (data||[]);
+      var hasContent = items.some(function(v){ return (v||"").trim(); });
+      if(!hasContent){
+        body = "<p class='ceremonial-note'>입력된 내용이 없습니다.</p>\n";
+      } else {
+        body = "<div class='multi-block'>\n";
+        items.forEach(function(v, i){
+          if((v||"").trim()){
+            body += "<div class='multi-item'>" + escapeHtml(v) + "</div>\n";
+          }
+        });
+        body += "</div>\n";
+      }
+
+    } else if(def.type === "free"){
+      var fval = (data||"").trim();
+      body = fval
+        ? "<div class='multi-item'>" + escapeHtml(fval) + "</div>\n"
+        : "<p class='ceremonial-note'>입력된 내용이 없습니다.</p>\n";
+    }
+
+    return "<div class='section'>\n" + title + body + "</div>\n";
+  }
+
+  function resetAll(){
+    state = {
+      className:"", topic:"", selectedIds: STEP_DEFS.map(function(s){return s.id;}),
+      currentIndex:0, sidebarCollapsed:false, stepData:{}, resultMode:{}
+    };
+    save();
+    showScreen("intro");
+  }
+
+  btnPrev.addEventListener("click", function(){
+    if(state.currentIndex > 0){ state.currentIndex--; save(); renderMeeting(); }
+  });
+  btnNext.addEventListener("click", function(){
+    var steps = selectedSteps();
+    if(state.currentIndex < steps.length - 1){ state.currentIndex++; save(); renderMeeting(); }
+  });
+
+  function renderMeeting(){
+    applySidebarState();
+    topbarClassEl.textContent = state.className || "학급";
+    topbarTopicEl.textContent = state.topic || "-";
+
+    var steps = selectedSteps();
+    if(state.currentIndex >= steps.length) state.currentIndex = Math.max(0, steps.length-1);
+    progressPillEl.textContent = (state.currentIndex+1) + " / " + steps.length + " 순서 진행 중";
+
+    renderJourney(steps);
+    renderStepCard(steps[state.currentIndex]);
+
+    btnPrev.disabled = state.currentIndex === 0;
+    btnNext.disabled = state.currentIndex === steps.length - 1;
+  }
+
+  function renderJourney(steps){
+    journeyEl.innerHTML = "";
+    steps.forEach(function(def, idx){
+      var item = document.createElement("div");
+      var cls = "journey-item";
+      if(idx === state.currentIndex) cls += " current";
+      else if(idx < state.currentIndex) cls += " done";
+      item.className = cls;
+      item.innerHTML =
+        '<div class="stone">' + (idx < state.currentIndex ? "✓" : def.emoji) + '</div>' +
+        '<div class="journey-label">' + (idx+1) + '. ' + def.label + '</div>';
+      item.addEventListener("click", function(){
+        state.currentIndex = idx;
+        save();
+        renderMeeting();
+      });
+      journeyEl.appendChild(item);
+    });
+  }
+
+  function renderStepCard(def){
+    if(!def){ stepCardEl.innerHTML = '<p class="empty-note">선택된 절차가 없습니다.</p>'; return; }
+    ensureStepData(def.id, def.type, def.slots);
+
+    var html =
+      '<div class="step-eyebrow">' +
+        '<span class="step-emoji">' + def.emoji + '</span>' +
+        '<span class="step-num">' + (state.currentIndex+1) + ' / ' + selectedSteps().length + ' 번째 순서</span>' +
+      '</div>' +
+      '<h3 class="step-title">' + def.label + '</h3>';
+
+    if(def.type === "ceremonial"){
+      html += renderCeremonial(def);
+    } else if(def.type === "flag"){
+      html += renderFlag(def);
+    } else if(def.type === "anthem"){
+      html += renderAnthem(def);
+    } else if(def.type === "alma"){
+      html += renderAlma(def);
+    } else if(def.type === "free"){
+      html += renderFree(def);
+    } else if(def.type === "multi"){
+      html += renderMulti(def);
+    } else if(def.type === "dept"){
+      html += renderDept(def);
+    } else if(def.type === "opinion"){
+      html += renderOpinionList(def, false);
+    } else if(def.type === "vote"){
+      var showResult = !!state.resultMode[def.id];
+      html += renderOpinionList(def, true, showResult);
+    }
+
+    stepCardEl.innerHTML = html;
+    bindStepEvents(def);
+  }
+
+  function renderCeremonial(def){
+    return (
+      '<div class="ceremonial">' +
+        '<div class="big-emoji">' + def.emoji + '</div>' +
+        '<p class="cere-text">' + def.hint + '</p>' +
+      '</div>'
+    );
+  }
+
+  function renderFlag(def){
+    return (
+      '<div class="anthem-wrap">' +
+        '<p class="yt-cere-text">' + def.hint + '</p>' +
+        '<div class="anthem-player-box">' +
+          '<video id="flag-video" preload="metadata">' +
+            '<source src="data/Salute_to_the_National_Flag.mp4" type="video/mp4">' +
+            '브라우저가 video 태그를 지원하지 않습니다.' +
+          '</video>' +
+          '<div class="anthem-overlay" id="flag-overlay">' +
+            '<button class="anthem-play-btn" id="flag-play-btn">▶</button>' +
+          '</div>' +
+        '</div>' +
+        '<p class="yt-source">[출처] 국기에 대한 경례, 한국저작권위원회 공유마당, CC BY</p>' +
+      '</div>'
+    );
+  }
+
+  function renderAnthem(def){
+    return (
+      '<div class="anthem-wrap">' +
+        '<p class="yt-cere-text">' + def.hint + '</p>' +
+        '<div class="anthem-player-box">' +
+          '<video id="anthem-video" preload="metadata" poster="">' +
+            '<source src="data/National_Anthem_of_Korea.mp4" type="video/mp4">' +
+            '브라우저가 video 태그를 지원하지 않습니다.' +
+          '</video>' +
+          '<div class="anthem-overlay" id="anthem-overlay">' +
+            '<button class="anthem-play-btn" id="anthem-play-btn">▶</button>' +
+          '</div>' +
+        '</div>' +
+        '<p class="yt-source">[출처] 애국가, 2019, KBS1</p>' +
+      '</div>'
+    );
+  }
+
+  function renderAlma(def){
+    return (
+      '<div class="anthem-wrap">' +
+        '<p class="yt-cere-text">' + def.hint + '</p>' +
+        '<div class="anthem-player-box">' +
+          '<video id="alma-video" preload="metadata">' +
+            '<source src="data/Gaebong_Alma_mater.mp4" type="video/mp4">' +
+            '브라우저가 video 태그를 지원하지 않습니다.' +
+          '</video>' +
+          '<div class="anthem-overlay" id="alma-overlay">' +
+            '<button class="anthem-play-btn" id="alma-play-btn">▶</button>' +
+          '</div>' +
+        '</div>' +
+        '<p class="yt-source">[출처] 서울개봉초등학교 방송부</p>' +
+      '</div>'
+    );
+  }
+
+  function renderFree(def){
+    var val = state.stepData[def.id] || "";
+    return (
+      '<div class="free-wrap">' +
+        '<p class="free-hint">' + def.hint + '</p>' +
+        '<textarea class="free-area" id="free-input" placeholder="내용을 입력해주세요...">' + escapeHtml(val) + '</textarea>' +
+      '</div>'
+    );
+  }
+
+  function renderMulti(def){
+    var arr = state.stepData[def.id] || [];
+    var html = '<div class="multi-wrap"><p class="free-hint">' + def.hint + '</p>';
+    arr.forEach(function(val, idx){
+      html += '<textarea class="multi-area" data-multi-idx="' + idx + '" placeholder="내용을 입력해주세요...">' + escapeHtml(val) + '</textarea>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function renderDept(def){
+    var rows = state.stepData[def.id] || [];
+    var html = '<div class="dept-wrap"><p class="free-hint">' + def.hint + '</p>';
+    html += '<div class="dept-rows" id="dept-rows">';
+    rows.forEach(function(row, idx){
+      html += '<div class="dept-row" data-idx="' + idx + '">' +
+        '<div class="row-num">' + (idx+1) + '</div>' +
+        '<input type="text" class="dept-name-in" placeholder="부서 이름" value="' + escapeAttr(row.dept) + '" data-field="dept">' +
+        '<input type="text" class="dept-content-in" placeholder="활동 내용을 입력해주세요" value="' + escapeAttr(row.content) + '" data-field="content">' +
+        '<button class="btn-remove-row" data-remove="' + idx + '">×</button>' +
+      '</div>';
+    });
+    html += '</div>';
+    html += '<button class="btn-add-row" id="btn-add-dept-row">＋ 부서 추가</button>';
+    html += '</div>';
+    return html;
+  }
+
+  function renderOpinionList(def, isVote, showResult){
+    if(isVote && showResult){
+      return renderVoteResults(def);
+    }
+    var rows = state.stepData[def.id] || [];
+    var html = '';
+    if(isVote && state.topic){
+      html += '<div class="topic-banner">🎯 이번 주 회의 주제 : ' + escapeHtml(state.topic) + '</div>';
+    }
+    html += '<div class="opinion-toolbar">' +
+      '<p class="opinion-hint">' + def.hint + '</p>';
+    if(isVote){
+      html += '<button class="btn-toggle-result" id="btn-show-result">📊 투표 결과 보기</button>';
+    }
+    html += '</div>';
+
+    html += '<div class="opinion-rows" id="opinion-rows">';
+    rows.forEach(function(row, idx){
+      html += '<div class="opinion-row" data-idx="' + idx + '">' +
+        '<div class="row-num">' + (idx+1) + '</div>' +
+        '<input type="text" class="name-in" placeholder="이름" value="' + escapeAttr(row.name) + '" data-field="name">' +
+        '<input type="text" class="opinion-in" placeholder="의견을 입력해주세요" value="' + escapeAttr(row.text) + '" data-field="text">';
+      if(isVote){
+        html += '<span class="vote-label">득표 수</span>' +
+          '<input type="number" min="0" class="vote-in" value="' + (row.votes||0) + '" data-field="votes">';
+      }
+      html += '<button class="btn-remove-row" data-remove="' + idx + '">×</button>' +
+      '</div>';
+    });
+    html += '</div>';
+    html += '<button class="btn-add-row" id="btn-add-row">＋ 의견 추가</button>';
+    return html;
+  }
+
+  function renderVoteResults(def){
+    var rows = (state.stepData[def.id] || []).filter(function(r){
+      return (r.name||"").trim() !== "" || (r.text||"").trim() !== "" || parseInt(r.votes,10) > 0;
+    });
+
+    var html = '<div class="opinion-toolbar">' +
+      '<p class="opinion-hint">결정된 실천 사항을 잘 지켜 주세요!</p>' +
+      '<button class="btn-toggle-result" id="btn-show-input">✏️ 입력 화면으로</button>' +
+      '</div>';
+
+    if(rows.length === 0){
+      html += '<p class="empty-note">아직 입력된 의견이 없어요. 입력 화면에서 의견과 득표 수를 넣어주세요.</p>';
+      return html;
+    }
+
+    var sorted = rows.slice().map(function(r){
+      return {name: r.name||"", text: r.text||"", votes: parseInt(r.votes,10)||0};
+    }).sort(function(a,b){ return b.votes - a.votes; });
+
+    var uniqueVotes = [];
+    sorted.forEach(function(r){
+      if(uniqueVotes.indexOf(r.votes) === -1) uniqueVotes.push(r.votes);
+    });
+    uniqueVotes.sort(function(a,b){ return b - a; });
+
+    var firstVote  = uniqueVotes[0];
+    var secondVote = uniqueVotes.length > 1 ? uniqueVotes[1] : null;
+
+    var rank1 = sorted.filter(function(r){ return r.votes === firstVote; });
+    var rank2 = secondVote !== null ? sorted.filter(function(r){ return r.votes === secondVote; }) : [];
+
+    html += '<div class="result-cards">';
+
+    rank1.forEach(function(r){
+      html +=
+        '<div class="result-card result-card--1">' +
+          '<div class="result-card__rank">1위</div>' +
+          '<div class="result-card__name">' + escapeHtml(r.name || "이름 없음") + '</div>' +
+          '<div class="result-card__text">' + escapeHtml(r.text) + '</div>' +
+          '<div class="result-card__votes">' + r.votes + '표</div>' +
+        '</div>';
+    });
+
+    rank2.forEach(function(r){
+      html +=
+        '<div class="result-card result-card--2">' +
+          '<div class="result-card__rank">2위</div>' +
+          '<div class="result-card__name">' + escapeHtml(r.name || "이름 없음") + '</div>' +
+          '<div class="result-card__text">' + escapeHtml(r.text) + '</div>' +
+          '<div class="result-card__votes">' + r.votes + '표</div>' +
+        '</div>';
+    });
+
+    html += '</div>';
+    return html;
+  }
+
+  function bindStepEvents(def){
+
+
+    if(def.type === "flag"){
+      var flagPlayBtn = document.getElementById("flag-play-btn");
+      var flagVideo = document.getElementById("flag-video");
+      var flagOverlay = document.getElementById("flag-overlay");
+      if(flagPlayBtn && flagVideo && flagOverlay){
+        function updateFlagBtn(){
+          flagPlayBtn.textContent = flagVideo.paused ? "▶" : "⏸";
+        }
+        flagOverlay.addEventListener("click", function(){
+          if(flagVideo.paused){
+            if(flagVideo.requestFullscreen){ flagVideo.requestFullscreen(); }
+            else if(flagVideo.webkitRequestFullscreen){ flagVideo.webkitRequestFullscreen(); }
+            else if(flagVideo.mozRequestFullScreen){ flagVideo.mozRequestFullScreen(); }
+            else if(flagVideo.msRequestFullscreen){ flagVideo.msRequestFullscreen(); }
+            flagVideo.play();
+          } else {
+            flagVideo.pause();
+          }
+          updateFlagBtn();
+        });
+        flagVideo.addEventListener("pause", updateFlagBtn);
+        flagVideo.addEventListener("play", updateFlagBtn);
+        document.addEventListener("fullscreenchange", function(){
+          if(!document.fullscreenElement && !document.webkitFullscreenElement){
+            flagVideo.pause();
+            updateFlagBtn();
+          }
+        }, {once: true});
+      }
+      return;
+    }
+
+    if(def.type === "alma"){
+      var almaPlayBtn = document.getElementById("alma-play-btn");
+      var almaVideo = document.getElementById("alma-video");
+      var almaOverlay = document.getElementById("alma-overlay");
+      if(almaPlayBtn && almaVideo && almaOverlay){
+        function updateAlmaBtn(){
+          almaPlayBtn.textContent = almaVideo.paused ? "▶" : "⏸";
+        }
+        almaOverlay.addEventListener("click", function(){
+          if(almaVideo.paused){
+            if(almaVideo.requestFullscreen){ almaVideo.requestFullscreen(); }
+            else if(almaVideo.webkitRequestFullscreen){ almaVideo.webkitRequestFullscreen(); }
+            else if(almaVideo.mozRequestFullScreen){ almaVideo.mozRequestFullScreen(); }
+            else if(almaVideo.msRequestFullscreen){ almaVideo.msRequestFullscreen(); }
+            almaVideo.play();
+          } else {
+            almaVideo.pause();
+          }
+          updateAlmaBtn();
+        });
+        almaVideo.addEventListener("pause", updateAlmaBtn);
+        almaVideo.addEventListener("play", updateAlmaBtn);
+        document.addEventListener("fullscreenchange", function(){
+          if(!document.fullscreenElement && !document.webkitFullscreenElement){
+            almaVideo.pause();
+            updateAlmaBtn();
+          }
+        }, {once: true});
+      }
+      return;
+    }
+
+    if(def.type === "anthem"){
+      var playBtn = document.getElementById("anthem-play-btn");
+      var video = document.getElementById("anthem-video");
+      var overlay = document.getElementById("anthem-overlay");
+      if(playBtn && video && overlay){
+        function updateBtn(){
+          playBtn.textContent = video.paused ? "▶" : "⏸";
+        }
+        overlay.addEventListener("click", function(){
+          if(video.paused){
+            if(video.requestFullscreen){
+              video.requestFullscreen();
+            } else if(video.webkitRequestFullscreen){
+              video.webkitRequestFullscreen();
+            } else if(video.mozRequestFullScreen){
+              video.mozRequestFullScreen();
+            } else if(video.msRequestFullscreen){
+              video.msRequestFullscreen();
+            }
+            video.play();
+          } else {
+            video.pause();
+          }
+          updateBtn();
+        });
+        video.addEventListener("pause", updateBtn);
+        video.addEventListener("play", updateBtn);
+        // 전체화면 종료 시 일시정지
+        document.addEventListener("fullscreenchange", function(){
+          if(!document.fullscreenElement && !document.webkitFullscreenElement){
+            video.pause();
+            updateBtn();
+          }
+        }, {once: true});
+      }
+      return;
+    }
+
+    if(def.type === "free"){
+      var ta = document.getElementById("free-input");
+      if(ta){
+        ta.addEventListener("input", function(){
+          state.stepData[def.id] = ta.value;
+          save();
+        });
+      }
+      return;
+    }
+
+    if(def.type === "multi"){
+      document.querySelectorAll(".multi-area").forEach(function(ta){
+        ta.addEventListener("input", function(){
+          var idx = parseInt(ta.getAttribute("data-multi-idx"), 10);
+          state.stepData[def.id][idx] = ta.value;
+          save();
+        });
+      });
+      return;
+    }
+
+    if(def.type === "dept"){
+      var deptRows = document.getElementById("dept-rows");
+      if(deptRows){
+        deptRows.querySelectorAll("input[type='text']").forEach(function(inp){
+          inp.addEventListener("input", function(){
+            var rowEl = inp.closest(".dept-row");
+            var idx = parseInt(rowEl.getAttribute("data-idx"), 10);
+            var field = inp.getAttribute("data-field");
+            state.stepData[def.id][idx][field] = inp.value;
+            save();
+          });
+        });
+        deptRows.querySelectorAll("[data-remove]").forEach(function(btn){
+          btn.addEventListener("click", function(){
+            var idx = parseInt(btn.getAttribute("data-remove"), 10);
+            state.stepData[def.id].splice(idx,1);
+            save();
+            renderStepCard(def);
+          });
+        });
+      }
+      var addDeptBtn = document.getElementById("btn-add-dept-row");
+      if(addDeptBtn){
+        addDeptBtn.addEventListener("click", function(){
+          state.stepData[def.id].push({dept:"", content:""});
+          save();
+          renderStepCard(def);
+        });
+      }
+      return;
+    }
+
+    if(def.type === "opinion" || def.type === "vote"){
+      // 투표 결과 보기 버튼
+      var showBtn = document.getElementById("btn-show-result");
+      if(showBtn){
+        showBtn.addEventListener("click", function(){
+          state.resultMode[def.id] = true;
+          save();
+          renderStepCard(def);
+        });
+      }
+      // 입력 화면으로 버튼
+      var backBtn = document.getElementById("btn-show-input");
+      if(backBtn){
+        backBtn.addEventListener("click", function(){
+          state.resultMode[def.id] = false;
+          save();
+          renderStepCard(def);
+        });
+      }
+
+      // 입력 행 이벤트
+      var rowsWrap = document.getElementById("opinion-rows");
+      if(rowsWrap){
+        rowsWrap.querySelectorAll("input").forEach(function(inp){
+          inp.addEventListener("input", function(){
+            var rowEl = inp.closest(".opinion-row");
+            var idx = parseInt(rowEl.getAttribute("data-idx"), 10);
+            var field = inp.getAttribute("data-field");
+            var row = state.stepData[def.id][idx];
+            if(!row) return;
+            if(field === "votes"){
+              row.votes = Math.max(0, parseInt(inp.value,10) || 0);
+            } else {
+              row[field] = inp.value;
+            }
+            save();
+          });
+        });
+        rowsWrap.querySelectorAll("[data-remove]").forEach(function(btn){
+          btn.addEventListener("click", function(){
+            var idx = parseInt(btn.getAttribute("data-remove"), 10);
+            state.stepData[def.id].splice(idx,1);
+            save();
+            renderStepCard(def);
+          });
+        });
+      }
+
+      var addBtn = document.getElementById("btn-add-row");
+      if(addBtn){
+        addBtn.addEventListener("click", function(){
+          state.stepData[def.id].push(emptyRow(def.type === "vote"));
+          save();
+          renderStepCard(def);
+        });
+      }
+    }
+  }
+
+  function escapeHtml(str){
+    return String(str || "").replace(/[&<>]/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];
+    });
+  }
+  function escapeAttr(str){
+    return escapeHtml(str).replace(/"/g, "&quot;");
+  }
+
+  /* ---------------- Init ---------------- */
+  load();
+  if(state.className || state.topic){
+    // restore mid-meeting session if it had begun
+    if(Object.keys(state.stepData).length > 0){
+      showScreen("meeting");
+      renderMeeting();
+    } else {
+      showScreen("setup");
+      renderChips();
+      syncSetupFields();
+    }
+  } else {
+    showScreen("intro");
+  }
+})();
+</script>
+</body>
+</html>
