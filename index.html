@@ -6,8 +6,7 @@
 <title>학급 어린이회</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Nanum+Square+Round:wght@400;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Square+Round:wght@400;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --cream:#FFF9EE;
@@ -40,7 +39,7 @@
       radial-gradient(circle at 92% 85%, rgba(73,196,238,0.16) 0, transparent 42%),
       var(--cream);
     color:var(--ink);
-    font-family:'Pretendard', 'Nanum Square Round', sans-serif;
+    font-family:'Noto Sans KR', 'Nanum Square Round', sans-serif;
     -webkit-font-smoothing:antialiased;
   }
   h1,h2,h3,.display{font-family:'Nanum Square Round', 'Pretendard', sans-serif; font-weight:800;}
@@ -219,7 +218,6 @@
   .topbar-topic b{color:var(--ink);}
   .progress-pill{font-size:16px; color:var(--ink-soft); background:#F3EFE3; padding:8px 16px; border-radius:999px;}
 
-  .stage{flex:1; padding:40px clamp(20px,5vw,60px) 20px; overflow-y:auto;}
   .step-card{
     max-width:1000px; margin:0 auto; background:var(--paper); border-radius:var(--radius-lg);
     box-shadow:var(--shadow); padding:clamp(28px,4vw,56px); min-height:60vh;
@@ -328,18 +326,28 @@
   }
   .empty-note{font-size:19px; color:var(--ink-soft); text-align:center; padding:40px 0;}
 
-  /* footer nav */
+  /* footer nav - fixed to bottom */
   .step-nav{
-    display:flex; justify-content:space-between; align-items:center; padding:18px clamp(20px,5vw,60px) 30px;
-    max-width:1000px; margin:0 auto; width:100%;
+    position:fixed; bottom:0; right:0;
+    left:320px; /* matches sidebar width */
+    display:flex; justify-content:space-between; align-items:center;
+    padding:14px clamp(20px,5vw,60px) 18px;
+    background:rgba(255,249,238,0.95);
+    backdrop-filter:blur(8px);
+    border-top:2px solid #EFE9DA;
+    z-index:10;
+    transition:left .22s ease;
   }
+  .sidebar.collapsed ~ .main .step-nav{left:96px;}
   .nav-btn{
-    font-size:20px; padding:16px 34px; border-radius:999px; border:none; display:flex; align-items:center; gap:8px;
+    font-size:20px; padding:14px 32px; border-radius:999px; border:none; display:flex; align-items:center; gap:8px;
   }
   .nav-prev{background:#F3EFE3; color:var(--ink-soft); box-shadow:0 5px 0 #E1D9C2;}
   .nav-next{background:var(--coral); color:#fff; box-shadow:0 5px 0 var(--coral-deep);}
   .nav-btn:disabled{opacity:0.35; cursor:not-allowed;}
   .nav-btn:not(:disabled):active{transform:translateY(3px); box-shadow:none;}
+  /* push stage content above fixed nav bar */
+  .stage{flex:1; padding:40px clamp(20px,5vw,60px) 100px; overflow-y:auto;}
 
   /* anthem local video */
   .anthem-wrap{
@@ -411,6 +419,7 @@
     .sidebar{position:fixed; z-index:20; height:100vh;}
     .sidebar.collapsed{width:0;}
     .meeting-shell{position:relative;}
+    .step-nav{left:0 !important;}
   }
 </style>
 </head>
@@ -704,6 +713,10 @@
   function applySidebarState(){
     sidebarEl.classList.toggle("collapsed", state.sidebarCollapsed);
     document.getElementById("btn-toggle-sidebar").textContent = state.sidebarCollapsed ? "▶" : "◀";
+    var nav = document.querySelector(".step-nav");
+    if(nav){
+      nav.style.left = state.sidebarCollapsed ? "96px" : "320px";
+    }
   }
 
   document.getElementById("btn-home").addEventListener("click", function(){
@@ -997,7 +1010,7 @@
         '<p class="yt-cere-text">' + def.hint + '</p>' +
         '<div class="anthem-player-box">' +
           '<video id="flag-video" preload="metadata">' +
-            '<source src="data/Salute_to_the_National_Flag.mp4" type="video/mp4">' +
+            '<source src="/class-meeting/data/Salute_to_the_National_Flag.mp4" type="video/mp4">' +
             '브라우저가 video 태그를 지원하지 않습니다.' +
           '</video>' +
           '<div class="anthem-overlay" id="flag-overlay">' +
@@ -1015,7 +1028,7 @@
         '<p class="yt-cere-text">' + def.hint + '</p>' +
         '<div class="anthem-player-box">' +
           '<video id="anthem-video" preload="metadata" poster="">' +
-            '<source src="data/National_Anthem_of_Korea.mp4" type="video/mp4">' +
+            '<source src="/class-meeting/data/National_Anthem_of_Korea.mp4" type="video/mp4">' +
             '브라우저가 video 태그를 지원하지 않습니다.' +
           '</video>' +
           '<div class="anthem-overlay" id="anthem-overlay">' +
@@ -1033,7 +1046,7 @@
         '<p class="yt-cere-text">' + def.hint + '</p>' +
         '<div class="anthem-player-box">' +
           '<video id="alma-video" preload="metadata">' +
-            '<source src="data/Gaebong_Alma_mater.mp4" type="video/mp4">' +
+            '<source src="/class-meeting/data/Gaebong_Alma_mater.mp4" type="video/mp4">' +
             '브라우저가 video 태그를 지원하지 않습니다.' +
           '</video>' +
           '<div class="anthem-overlay" id="alma-overlay">' +
