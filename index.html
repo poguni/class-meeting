@@ -382,6 +382,25 @@
   }
   .anthem-play-btn:hover{transform:scale(1.1);}
 
+  /* alma file loader */
+  .alma-file-row{
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+    background:#F8F4EC; border:2px solid #EFE9DA; border-radius:var(--radius-sm);
+    padding:10px 16px;
+  }
+  .alma-file-label{
+    font-size:15px; padding:9px 20px; border-radius:999px; border:none;
+    background:var(--mint); color:#fff; cursor:pointer; flex-shrink:0;
+    box-shadow:0 3px 0 var(--mint-deep); white-space:nowrap;
+  }
+  .alma-file-label:hover{opacity:.9;}
+  .alma-file-name{font-size:15px; color:var(--ink-soft); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .alma-file-reset{
+    font-size:13px; padding:8px 14px; border-radius:999px; border:none;
+    background:#F3EFE3; color:var(--ink-soft); flex-shrink:0; cursor:pointer;
+  }
+  .alma-file-reset:hover{background:#EBE3CE;}
+
   /* topic banner */
   .topic-banner{
     font-family:'Nanum Square Round','Pretendard',sans-serif; font-weight:800;
@@ -523,7 +542,7 @@
     {id:5,  label:"다음 주 생활 계획",  emoji:"🗳️", type:"vote",      hint:"다음 주 실천 사항을 발표하고, 투표로 결정해 봅시다."},
     {id:6,  label:"각 부서 발표",       emoji:"📊", type:"dept",      hint:"각 부서에서 이번 주 활동을 발표해주세요."},
     {id:7,  label:"활동 보고",          emoji:"📋", type:"multi",     hint:"학급 활동에 대해 보고할 내용을 적어주세요.", slots:3},
-    {id:8,  label:"건의 사항",          emoji:"💡", type:"opinion",   hint:"우리 반과 학교를 위한 좋은 의견을 자유롭게 나눠주세요."},
+    {id:8,  label:"건의 사항",          emoji:"💡", type:"opinion",   hint:"우리 반과 학교를 위한 좋은 의견을 자유롭게 발표해 주세요."},
     {id:9,  label:"자유 발언 시간",     emoji:"🎤", type:"multi",     hint:"하고 싶은 이야기를 자유롭게 이야기해 봅시다.", slots:3},
     {id:10, label:"선생님 말씀",        emoji:"🍎", type:"multi",     hint:"선생님이 들려주시는 말씀을 적어 봅시다.", slots:3},
     {id:11, label:"칭찬합니다!",        emoji:"👏", type:"opinion",   hint:"친구에게 고마웠던 일, 칭찬하고 싶은 점을 나누어 봅시다."},
@@ -542,7 +561,9 @@
     currentIndex: 0,
     sidebarCollapsed: false,
     stepData: {},      // id -> {text} for free, [] for opinion/vote
-    resultMode: {}      // id -> bool (vote step showing results)
+    resultMode: {},     // id -> bool (vote step showing results)
+    almaObjectUrl: "",  // object URL for custom alma mater video
+    almaFileName: ""    // display name of loaded alma mater file
   };
 
   function emptyRow(hasVote){
@@ -1041,19 +1062,28 @@
   }
 
   function renderAlma(def){
+    var hasCustom = !!state.almaObjectUrl;
+    var videoSrc = hasCustom ? state.almaObjectUrl : "https://github.com/poguni/class-meeting/releases/download/1.0/Gaebong_Alma_mater.mp4";
     return (
       '<div class="anthem-wrap">' +
         '<p class="yt-cere-text">' + def.hint + '</p>' +
         '<div class="anthem-player-box">' +
           '<video id="alma-video" preload="metadata">' +
-            '<source src="https://github.com/poguni/class-meeting/releases/download/1.0/Gaebong_Alma_mater.mp4" type="video/mp4">' +
+            '<source id="alma-source" src="' + videoSrc + '" type="video/mp4">' +
             '브라우저가 video 태그를 지원하지 않습니다.' +
           '</video>' +
           '<div class="anthem-overlay" id="alma-overlay">' +
             '<button class="anthem-play-btn" id="alma-play-btn">▶</button>' +
           '</div>' +
         '</div>' +
-        '<p class="yt-source">[출처] 서울개봉초등학교 방송부</p>' +
+        '<div class="alma-file-row">' +
+          '<label class="alma-file-label" for="alma-file-input">📂 우리 학교 교가 파일 불러오기</label>' +
+          '<input type="file" id="alma-file-input" accept="video/mp4,video/*" style="display:none">' +
+          (hasCustom ? '<span class="alma-file-name" id="alma-file-name">✅ ' + escapeHtml(state.almaFileName||"파일 로드됨") + '</span>' +
+                       '<button class="alma-file-reset" id="alma-file-reset">기본 교가로</button>'
+                     : '<span class="alma-file-name" id="alma-file-name">기본 교가 재생 중</span>') +
+        '</div>' +
+        '<p class="yt-source">' + (hasCustom ? '' : '[출처] 서울개봉초등학교 방송부') + '</p>' +
       '</div>'
     );
   }
@@ -1103,7 +1133,7 @@
     var rows = state.stepData[def.id] || [];
     var html = '';
     if(isVote && state.topic){
-      html += '<div class="topic-banner">🎯 이번 주 회의 주제 : ' + escapeHtml(state.topic) + '</div>';
+      html += '<div class="topic-banner">🎯 회의 주제 : ' + escapeHtml(state.topic) + '</div>';
     }
     html += '<div class="opinion-toolbar">' +
       '<p class="opinion-hint">' + def.hint + '</p>';
@@ -1226,6 +1256,10 @@
       var almaPlayBtn = document.getElementById("alma-play-btn");
       var almaVideo = document.getElementById("alma-video");
       var almaOverlay = document.getElementById("alma-overlay");
+      var almaFileInput = document.getElementById("alma-file-input");
+      var almaFileLabel = document.querySelector(".alma-file-label");
+      var almaFileReset = document.getElementById("alma-file-reset");
+
       if(almaPlayBtn && almaVideo && almaOverlay){
         function updateAlmaBtn(){
           almaPlayBtn.textContent = almaVideo.paused ? "▶" : "⏸";
@@ -1250,6 +1284,48 @@
             updateAlmaBtn();
           }
         }, {once: true});
+      }
+
+      // 파일 불러오기
+      if(almaFileInput){
+        almaFileInput.addEventListener("change", function(){
+          var file = almaFileInput.files[0];
+          if(!file) return;
+          // 이전 objectURL 해제
+          if(state.almaObjectUrl) URL.revokeObjectURL(state.almaObjectUrl);
+          state.almaObjectUrl = URL.createObjectURL(file);
+          state.almaFileName = file.name;
+          // 비디오 소스 교체
+          var src = document.getElementById("alma-source");
+          if(src){ src.src = state.almaObjectUrl; }
+          almaVideo.load();
+          // 파일명 표시 업데이트
+          var nameEl = document.getElementById("alma-file-name");
+          if(nameEl) nameEl.textContent = "✅ " + file.name;
+          // 출처 숨김
+          var sourceEl = almaVideo.closest(".anthem-wrap").querySelector(".yt-source");
+          if(sourceEl) sourceEl.textContent = "";
+          // 리셋 버튼 표시
+          if(!document.getElementById("alma-file-reset")){
+            var resetBtn = document.createElement("button");
+            resetBtn.id = "alma-file-reset";
+            resetBtn.className = "alma-file-reset";
+            resetBtn.textContent = "기본 교가로";
+            almaFileInput.parentNode.appendChild(resetBtn);
+            resetBtn.addEventListener("click", resetAlma);
+          }
+        });
+      }
+
+      // 기본 교가로 리셋
+      function resetAlma(){
+        if(state.almaObjectUrl){ URL.revokeObjectURL(state.almaObjectUrl); }
+        state.almaObjectUrl = "";
+        state.almaFileName = "";
+        renderStepCard(def);
+      }
+      if(almaFileReset){
+        almaFileReset.addEventListener("click", resetAlma);
       }
       return;
     }
